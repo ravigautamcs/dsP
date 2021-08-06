@@ -1,60 +1,66 @@
-//  32. Program to find shortest path (Floyad Warshal Algorithm) of given directed graph.
-
-// Floyd-Warshall Algorithm in C
+// 23. Program to construct a graph using adjacency list.
 
 #include <stdio.h>
-
-// defining the number of vertices
-#define nV 4
-
-#define INF 999
-
-void printMatrix(int matrix[][nV]);
-
-// Implementing floyd warshall algorithm
-void floydWarshall(int graph[][nV])
+#include <stdlib.h>
+struct node
 {
-    int matrix[nV][nV], i, j, k;
-
-    for (i = 0; i < nV; i++)
-        for (j = 0; j < nV; j++)
-            matrix[i][j] = graph[i][j];
-
-    // Adding vertices individually
-    for (k = 0; k < nV; k++)
-    {
-        for (i = 0; i < nV; i++)
-        {
-            for (j = 0; j < nV; j++)
-            {
-                if (matrix[i][k] + matrix[k][j] < matrix[i][j])
-                    matrix[i][j] = matrix[i][k] + matrix[k][j];
-            }
-        }
-    }
-    printMatrix(matrix);
+    int vertex;
+    struct node *next;
+};
+struct node *createNode(int);
+struct Graph
+{
+    int numVertices;
+    struct node **adjLists;
+};
+struct node *createNode(int v)
+{
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->vertex = v;
+    newNode->next = NULL;
+    return newNode;
 }
-
-void printMatrix(int matrix[][nV])
+struct Graph *createAGraph(int vertices)
 {
-    for (int i = 0; i < nV; i++)
+    struct Graph *graph = malloc(sizeof(struct Graph));
+    graph->numVertices = vertices;
+    graph->adjLists = malloc(vertices * sizeof(struct node *));
+    int i;
+    for (i = 0; i < vertices; i++)
+        graph->adjLists[i] = NULL;
+    return graph;
+}
+void addEdge(struct Graph *graph, int s, int d)
+{
+    struct node *newNode = createNode(d);
+    newNode->next = graph->adjLists[s];
+    graph->adjLists[s] = newNode;
+    newNode = createNode(s);
+    newNode->next = graph->adjLists[d];
+    graph->adjLists[d] = newNode;
+}
+void printGraph(struct Graph *graph)
+{
+    int v;
+    for (v = 0; v < graph->numVertices; v++)
     {
-        for (int j = 0; j < nV; j++)
+        struct node *temp = graph->adjLists[v];
+        printf("\nVertex %d\n: ", v);
+        while (temp)
         {
-            if (matrix[i][j] == INF)
-                printf("%4s", "INF");
-            else
-                printf("%4d", matrix[i][j]);
+            printf("%d -> ", temp->vertex);
+            temp = temp->next;
         }
         printf("\n");
     }
 }
-
 int main()
 {
-    int graph[nV][nV] = {{0, 3, INF, 5},
-                         {2, 0, INF, 4},
-                         {INF, 1, 0, INF},
-                         {INF, INF, 2, 0}};
-    floydWarshall(graph);
+    struct Graph *graph = createAGraph(4);
+    addEdge(graph, 0, 1);
+    addEdge(graph, 0, 2);
+    addEdge(graph, 0, 3);
+    addEdge(graph, 1, 2);
+    printGraph(graph);
+    return 0;
 }

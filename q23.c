@@ -1,62 +1,66 @@
+// 23. Program to construct a graph using adjacency list.
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-
-typedef struct graph{
-
+struct node
+{
+    int vertex;
+    struct node *next;
+};
+struct node *createNode(int);
+struct Graph
+{
+    int numVertices;
+    struct node **adjLists;
+};
+struct node *createNode(int v)
+{
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->vertex = v;
+    newNode->next = NULL;
+    return newNode;
+}
+struct Graph *createAGraph(int vertices)
+{
+    struct Graph *graph = malloc(sizeof(struct Graph));
+    graph->numVertices = vertices;
+    graph->adjLists = malloc(vertices * sizeof(struct node *));
+    int i;
+    for (i = 0; i < vertices; i++)
+        graph->adjLists[i] = NULL;
+    return graph;
+}
+void addEdge(struct Graph *graph, int s, int d)
+{
+    struct node *newNode = createNode(d);
+    newNode->next = graph->adjLists[s];
+    graph->adjLists[s] = newNode;
+    newNode = createNode(s);
+    newNode->next = graph->adjLists[d];
+    graph->adjLists[d] = newNode;
+}
+void printGraph(struct Graph *graph)
+{
     int v;
-    int **adjMatrix;
-
-}graph;
-
-graph* createGraph(int v){
-    graph* g=(graph*)malloc(sizeof(graph));
-    g->v=v;
-    g->adjMatrix=(int**)malloc(g->v*g->v*sizeof(int));
-
-    for (int i = 0; i <g->v; i++)
+    for (v = 0; v < graph->numVertices; v++)
     {
-       for(int j=0; j< g->v; j++){
-           g->adjMatrix[i][j]=0;
-       }
-    }
-
-    return g;
-    
-}
-
-void addEdge(graph* g,int src ,int dest, bool bidirected){ 
-    g->adjMatrix[src][dest]=1;
-
-    if(bidirected){
-        g->adjMatrix[dest][src]=1;
-    }
-}
-
-void printGraph(graph* g){
-    printf("\nGraph: \n");
-    for (int i = 0; i < g->v; i++)
-    {
-        for(int j=0; j<g->v ; j++){
-            printf("%d ",g->adjMatrix[i][j]);
+        struct node *temp = graph->adjLists[v];
+        printf("\nVertex %d\n: ", v);
+        while (temp)
+        {
+            printf("%d -> ", temp->vertex);
+            temp = temp->next;
         }
-
         printf("\n");
     }
-    
-    printf("\n");
 }
-void main(){
-    graph* g= createGraph(5); 
-
-    addEdge(g,3,4,true);
-    addEdge(g,2,3,true);
-    addEdge(g,1,4,true);
-    addEdge(g,1,3,true);
-    addEdge(g,1,2,true);
-    addEdge(g,0,4,true);
-    addEdge(g,0,1,true);
-
-    printGraph(g);
-
+int main()
+{
+    struct Graph *graph = createAGraph(4);
+    addEdge(graph, 0, 1);
+    addEdge(graph, 0, 2);
+    addEdge(graph, 0, 3);
+    addEdge(graph, 1, 2);
+    printGraph(graph);
+    return 0;
 }
